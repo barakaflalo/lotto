@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוטו ישראל - מנתח סטטיסטי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;
+    --gold:#f5c842;--gold2:#e8a020;
+    --hot:#ff4d4d;--warm:#ff8c42;--cold:#4d9fff;--cool:#a0c4ff;--strong:#c084fc;
+    --text:#e8e8f0;--muted:#6b6b8a;--border:#2a2a3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:
+    radial-gradient(ellipse 80% 60% at 20% 10%,rgba(245,200,66,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 90%,rgba(192,132,252,.07) 0%,transparent 60%);
+    pointer-events:none;z-index:0}
+  .container{max-width:1100px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+
+  header{padding:40px 0 30px;text-align:center;border-bottom:1px solid var(--border)}
+  .logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
+  .logo-ball{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));
+    display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#1a1000;
+    box-shadow:0 0 24px rgba(245,200,66,.4);animation:pulse 3s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 24px rgba(245,200,66,.4)}50%{box-shadow:0 0 40px rgba(245,200,66,.7)}}
+  h1{font-size:clamp(26px,5vw,42px);font-weight:900;color:var(--gold);letter-spacing:-1px}
+  .subtitle{color:var(--muted);font-size:14px;margin-top:4px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;padding:24px 0}
+  .btn{padding:10px 22px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);
+    color:var(--text);font-family:'Heebo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+  .btn:hover{border-color:var(--gold);color:var(--gold)}
+  .btn.primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1000;border-color:transparent}
+  .btn.primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(245,200,66,.3)}
+  .btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.1)}
+
+  #status{text-align:center;padding:12px;font-size:13px;color:var(--muted);min-height:40px}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);
+    border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .stats-bar{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-bottom:24px}
+  .stat-pill{background:var(--surface);border:1px solid var(--border);border-radius:100px;
+    padding:8px 18px;font-size:13px;display:flex;align-items:center;gap:8px}
+  .stat-pill span{color:var(--gold);font-weight:700;font-size:16px}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding-bottom:20px;font-size:12px;color:var(--muted)}
+  .legend-item{display:flex;align-items:center;gap:6px}
+  .legend-dot{width:12px;height:12px;border-radius:50%}
+
+  .section{margin-bottom:36px}
+  .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+    color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  .balls-grid{display:flex;flex-wrap:wrap;gap:10px}
+  .ball-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .2s}
+  .ball-item:hover{transform:scale(1.1)}
+  .ball{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:16px;font-weight:900;position:relative;transition:all .3s}
+  .ball-count{font-size:12px;font-weight:700}
+
+  .heat-5{background:linear-gradient(135deg,#ff2020,#ff6060);color:#fff;box-shadow:0 0 16px rgba(255,40,40,.5)}
+  .heat-4{background:linear-gradient(135deg,#ff5500,#ff8c42);color:#fff;box-shadow:0 0 12px rgba(255,100,40,.4)}
+  .heat-3{background:linear-gradient(135deg,#e8c040,#f5dd80);color:#1a1000;box-shadow:0 0 10px rgba(240,200,60,.3)}
+  .heat-2{background:linear-gradient(135deg,#2060d0,#4d9fff);color:#fff;box-shadow:0 0 10px rgba(77,159,255,.3)}
+  .heat-1{background:linear-gradient(135deg,#0a2050,#1a3a80);color:#a0c4ff;box-shadow:0 0 8px rgba(30,60,180,.3)}
+  .heat-strong{background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;box-shadow:0 0 14px rgba(192,132,252,.5)}
+
+  .top-list{display:flex;flex-direction:column;gap:8px}
+  .top-row{display:flex;align-items:center;gap:12px;background:var(--surface);
+    border:1px solid var(--border);border-radius:10px;padding:10px 16px;transition:border-color .2s}
+  .top-row:hover{border-color:var(--gold)}
+  .top-rank{font-size:13px;color:var(--muted);width:24px}
+  .top-ball-mini{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:14px;font-weight:900;flex-shrink:0}
+  .top-label{flex:1;font-size:14px}
+  .top-count{font-weight:700;color:var(--gold);font-size:15px}
+  .top-bar-wrap{flex:2;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+  .top-bar{height:100%;border-radius:3px;transition:width 1s ease}
+
+  .recent-grid{display:flex;flex-direction:column;gap:10px}
+  .recent-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .recent-date{font-size:12px;color:var(--muted);min-width:90px}
+  .recent-balls{display:flex;gap:6px;flex-wrap:wrap}
+  .mini-ball{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:12px;font-weight:900}
+  .mini-strong{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+
+  .gen-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:24px;display:flex;flex-direction:column;align-items:center;gap:20px}
+  .gen-balls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:60px}
+  .gen-ball{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:18px;font-weight:900;
+    animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  .gen-note{font-size:12px;color:var(--muted);text-align:center;max-width:400px;line-height:1.6}
+
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px}
+  .tab{padding:10px 20px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;
+    border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+  .source-badge{display:inline-block;padding:4px 12px;border-radius:100px;font-size:11px;
+    background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);color:var(--gold);margin-top:6px}
+  .disclaimer{margin:30px 0;padding:16px 20px;background:rgba(245,200,66,.05);
+    border:1px solid rgba(245,200,66,.2);border-radius:10px;font-size:13px;color:var(--muted);
+    line-height:1.6;text-align:center}
+
+  @media(max-width:600px){.ball{width:44px;height:44px;font-size:14px}.balls-grid{gap:6px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo-row">
+      <div class="logo-ball">🎱</div>
+      <h1>לוטו ישראל</h1>
+      <div class="logo-ball" style="background:linear-gradient(135deg,#7c3aed,#c084fc)">✦</div>
+    </div>
+    <p class="subtitle">מנתח סטטיסטי חכם · נתונים מאתר הפיס בזמן אמת</p>
+  </header>
+
+  <div style="padding-top:24px">
+    <div class="controls">
+      <button class="btn active" onclick="setRange(50)"  id="btn50">50 הגרלות</button>
+      <button class="btn"        onclick="setRange(100)" id="btn100">100 הגרלות</button>
+      <button class="btn"        onclick="setRange(200)" id="btn200">200 הגרלות</button>
+      <button class="btn"        onclick="setRange(500)" id="btn500">500 הגרלות</button>
+      <button class="btn primary" onclick="loadData()">🔄 טען נתונים</button>
+    </div>
+    <div id="status">לחץ על "טען נתונים" להתחלה</div>
+    <div id="source-info" style="text-align:center;display:none">
+      <span id="source-badge" class="source-badge"></span>
+    </div>
+  </div>
+
+  <div id="stats-bar" class="stats-bar" style="display:none"></div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('heat',this)">🔥 מפת חום</div>
+    <div class="tab" onclick="showTab('top',this)">🏆 טופ מספרים</div>
+    <div class="tab" onclick="showTab('recent',this)">📅 הגרלות אחרונות</div>
+    <div class="tab" onclick="showTab('gen',this)">✨ מחולל חכם</div>
+  </div>
+
+  <div id="tab-heat">
+    <div class="section">
+      <div class="section-title">מספרים רגילים (1–37)</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#ff2020"></div>לוהט מאוד</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ff8c42"></div>חם</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f5dd80"></div>נייטרלי</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4d9fff"></div>קר</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1a3a80"></div>קפוא</div>
+      </div>
+      <div class="balls-grid" id="main-grid"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">מספר חזק (1–7)</div>
+      <div class="balls-grid" id="strong-grid"></div>
+    </div>
+  </div>
+
+  <div id="tab-top" style="display:none">
+    <div class="section"><div class="section-title">10 המספרים הכי חמים</div><div class="top-list" id="top-hot"></div></div>
+    <div class="section"><div class="section-title">10 המספרים הכי קרים</div><div class="top-list" id="top-cold"></div></div>
+    <div class="section"><div class="section-title">מספרים חזקים — תדירות</div><div class="top-list" id="top-strong"></div></div>
+  </div>
+
+  <div id="tab-recent" style="display:none">
+    <div class="section"><div class="section-title">20 הגרלות אחרונות</div><div class="recent-grid" id="recent-list"></div></div>
+  </div>
+
+  <div id="tab-gen" style="display:none">
+    <div class="section">
+      <div class="section-title">מחולל שורות חכם</div>
+      <div class="gen-box">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <button class="btn active" onclick="setGenMode('hot')"    id="gHot">🔥 מספרים חמים</button>
+          <button class="btn"        onclick="setGenMode('cold')"   id="gCold">❄️ מספרים קרים</button>
+          <button class="btn"        onclick="setGenMode('mix')"    id="gMix">⚖️ מאוזן</button>
+          <button class="btn"        onclick="setGenMode('random')" id="gRand">🎲 אקראי לחלוטין</button>
+        </div>
+        <div class="gen-balls" id="gen-balls"><p style="color:var(--muted)">לחץ "צור שורה" כדי להתחיל</p></div>
+        <button class="btn primary" style="font-size:16px;padding:14px 36px" onclick="generateLine()">🎯 צור שורה</button>
+        <div id="gen-history" style="width:100%;display:flex;flex-direction:column;gap:6px"></div>
+        <p class="gen-note">⚠️ הלוטו הוא הגרלה אקראית לחלוטין. המחולל מבוסס על סטטיסטיקה היסטורית לצורך בידור בלבד.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">📊 הלוטו הוא הגרלה אקראית לחלוטין — הסטטיסטיקה לצרכי בידור ומידע בלבד</div>
+  <div style="max-width:1100px;margin:16px auto;padding:0 20px;">
+    <div style="background:rgba(212,168,83,0.08);border:1px solid rgba(212,168,83,0.2);border-radius:12px;padding:12px 16px;">
+      <a href="https://barakaflalo.github.io/appnest" target="_blank" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
+        <svg width="32" height="32" viewBox="0 0 58 58" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="29,2 54,16 54,42 29,56 4,42 4,16" fill="#d4a853"/>
+          <polygon points="29,5 51,17.5 51,40.5 29,53 7,40.5 7,17.5" fill="#0a0a0a"/>
+          <ellipse cx="29" cy="46" rx="13" ry="4" fill="#6B3A00"/>
+          <ellipse cx="29" cy="45" rx="10" ry="3" fill="#8B5E0A"/>
+          <ellipse cx="24" cy="44" rx="3" ry="2.2" fill="#d4c070"/>
+          <ellipse cx="29" cy="43.5" rx="3" ry="2.2" fill="#d4c070"/>
+          <ellipse cx="34" cy="44" rx="3" ry="2.2" fill="#d4c070"/>
+          <ellipse cx="29" cy="30" rx="7" ry="8" fill="#1e1e1e"/>
+          <ellipse cx="29" cy="19" rx="6.5" ry="6.5" fill="#e8e8e0"/>
+          <circle cx="31" cy="18" r="2" fill="#d4a853"/>
+          <circle cx="31" cy="18" r="1" fill="#0a0a0a"/>
+          <path d="M33 20 L39 22 L33 24 Z" fill="#d4a853"/>
+          <path d="M22 26 Q12 20 8 24 Q10 30 18 29 Q20 28 22 30Z" fill="#222"/>
+          <path d="M36 26 Q46 20 50 24 Q48 30 40 29 Q38 28 36 30Z" fill="#222"/>
+          <path d="M24 39 Q29 44 34 39 Q31 42 29 40 Q27 42 24 39Z" fill="#d0d0c8"/>
+        </svg>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:#d4a853;font-family:'Heebo',sans-serif;">AppNest — קן האפליקציות</div>
+          <div style="font-size:12px;color:#6b6b8a;font-family:'Heebo',sans-serif;">עוד אפליקציות חינמיות — לא שכחתי, משחקים ועוד ›</div>
+        </div>
+        <span style="color:#d4a853;font-size:20px;">›</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ─────────────────────────────────────────────────────
+// ניסיון גישה ישירה לפיס — עובד מ-IP ישראלי
+const PAIS_URLS = [
+  'https://api.pais.co.il/game/lotto/results?gameType=LOTTO&count=',
+  'https://www.pais.co.il/api/Lotto/GetLastDrawResults?count=',
+];
+
+// ── State ───────────────────────────────────────────────────────
+let allDraws=[], mainFreq={}, strongFreq={}, rangeCount=50, genMode='hot', genHistory=[];
+
+// ── UI Helpers ──────────────────────────────────────────────────
+function setRange(n){
+  rangeCount=n;
+  ['50','100','200','500'].forEach(x=>document.getElementById('btn'+x).classList.toggle('active',x==n));
+}
+function setGenMode(m){
+  genMode=m;
+  const map={hot:'Hot',cold:'Cold',mix:'Mix',random:'Rand'};
+  Object.values(map).forEach(x=>document.getElementById('g'+x).classList.remove('active'));
+  document.getElementById('g'+map[m]).classList.add('active');
+}
+function showTab(name,el){
+  document.querySelectorAll('[id^="tab-"]').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='';
+  el.classList.add('active');
+}
+function setStatus(msg,loading=false){
+  document.getElementById('status').innerHTML=(loading?'<span class="spinner"></span>':'')+msg;
+}
+
+// ── Load Data ───────────────────────────────────────────────────
+async function loadData(){
+  setStatus('<span class="spinner"></span>מנסה לטעון נתונים מהפיס...',true);
+  let loaded = false;
+  // נסה API ישיר לפיס (עובד מ-IP ישראלי)
+  for (const baseUrl of PAIS_URLS) {
+    try {
+      const r = await fetch(baseUrl + rangeCount, {
+        headers: { 'Accept': 'application/json', 'Accept-Language': 'he-IL' },
+        signal: AbortSignal.timeout(6000)
+      });
+      if (!r.ok) continue;
+      const data = await r.json();
+      const arr = data?.LottoResult || data?.lottoResult || data?.results ||
+                  data?.Draws || data?.draws || (Array.isArray(data)?data:null);
+      if (!arr?.length) continue;
+      const draws = arr.map(item => {
+        const rawNums = item.ResultsNumber??item.Numbers??item.numbers??item.MainNumbers??item.Balls;
+        const rawStrong = item.StrongNumber??item.strongNumber??item.Strong??item.strong??item.Bonus;
+        const rawDate = item.DrawDate??item.drawDate??item.Date??item.date??'';
+        if (!rawNums || !rawStrong) return null;
+        const numbers = (Array.isArray(rawNums)?rawNums:String(rawNums).split(/[,\s]+/))
+          .map(Number).filter(n=>n>=1&&n<=37);
+        const strong = Number(rawStrong);
+        if (numbers.length!==6||strong<1||strong>7) return null;
+        return { date: rawDate?new Date(rawDate).toLocaleDateString('he-IL'):'', numbers:numbers.sort((a,b)=>a-b), strong };
+      }).filter(Boolean);
+      if (draws.length >= 10) {
+        allDraws = draws;
+        setStatus(`✅ נטענו ${allDraws.length} הגרלות אמיתיות מהפיס`);
+        document.getElementById('source-badge').textContent='🌐 נתונים אמיתיים מהפיס';
+        document.getElementById('source-info').style.display='block';
+        processAndRender();
+        loaded = true;
+        break;
+      }
+    } catch(e) { continue; }
+  }
+  if (!loaded) {
+    // Fallback to demo
+    setStatus('📊 מציג נתוני סטטיסטיקה (נתוני דמו — לנתונים אמיתיים פתח מ-IP ישראלי)');
+    allDraws = generateDemo(500);
+    document.getElementById('source-badge').textContent='🎭 נתוני הדגמה';
+    document.getElementById('source-info').style.display='block';
+    processAndRender();
+  }
+}
+
+// ── Demo generator ──────────────────────────────────────────────
+function generateDemo(n){
+  const bias={1:1.3,7:.7,13:.6,14:1.4,16:1.5,22:1.3,28:1.4,32:1.2,3:.8,27:.75};
+  const draws=[];let d=new Date('2024-12-31');
+  for(let i=0;i<n;i++){
+    const pool=[];
+    for(let x=1;x<=37;x++){const w=bias[x]||1;for(let j=0;j<Math.round(w*10);j++)pool.push(x);}
+    const nums=[];
+    while(nums.length<6){const p=pool[Math.floor(Math.random()*pool.length)];if(!nums.includes(p))nums.push(p);}
+    nums.sort((a,b)=>a-b);
+    draws.push({date:d.toLocaleDateString('he-IL'),numbers:nums,strong:Math.ceil(Math.random()*7)});
+    d.setDate(d.getDate()-3.5);
+  }
+  return draws;
+}
+
+// ── Process ─────────────────────────────────────────────────────
+function processAndRender(){
+  const slice=allDraws.slice(0,rangeCount);
+  mainFreq={};strongFreq={};
+  for(let i=1;i<=37;i++) mainFreq[i]=0;
+  for(let i=1;i<=7;i++)  strongFreq[i]=0;
+  for(const dr of slice){
+    for(const n of dr.numbers) mainFreq[n]=(mainFreq[n]||0)+1;
+    strongFreq[dr.strong]=(strongFreq[dr.strong]||0)+1;
+  }
+  renderAll(slice);
+  document.getElementById('stats-bar').style.display='flex';
+}
+
+// ── Stats ───────────────────────────────────────────────────────
+function calcStats(freq){
+  const v=Object.values(freq);
+  const avg=v.reduce((a,b)=>a+b,0)/v.length;
+  const std=Math.sqrt(v.reduce((s,x)=>s+(x-avg)**2,0)/v.length);
+  return{avg,std};
+}
+function heatLevel(c,avg,std){
+  if(c>=avg+2*std)return 5;
+  if(c>=avg+std)  return 4;
+  if(c>=avg-std)  return 3;
+  if(c>=avg-2*std)return 2;
+  return 1;
+}
+function heatClass(lv){return['heat-1','heat-2','heat-3','heat-4','heat-5'][lv-1]}
+
+// ── Render ──────────────────────────────────────────────────────
+function renderAll(slice){
+  const{avg,std}=calcStats(mainFreq);
+  const{avg:sa,std:ss}=calcStats(strongFreq);
+  const sorted=Object.entries(mainFreq).sort((a,b)=>b[1]-a[1]);
+  const maxC=sorted[0][1];
+
+  // Stats bar
+  document.getElementById('stats-bar').innerHTML=`
+    <div class="stat-pill">📊 הגרלות: <span>${slice.length}</span></div>
+    <div class="stat-pill">🔥 הכי חם: <span>${sorted[0][0]}</span>(${sorted[0][1]}x)</div>
+    <div class="stat-pill">❄️ הכי קר: <span>${[...sorted].reverse()[0][0]}</span>(${[...sorted].reverse()[0][1]}x)</div>
+    <div class="stat-pill">📈 ממוצע: <span>${avg.toFixed(1)}</span></div>`;
+
+  // Main grid
+  document.getElementById('main-grid').innerHTML=[...Array(37)].map((_,i)=>{
+    const n=i+1,c=mainFreq[n]||0,lv=heatLevel(c,avg,std);
+    return`<div class="ball-item" title="מספר ${n}: ${c} פעמים">
+      <div class="ball ${heatClass(lv)}">${n}</div>
+      <div class="ball-count" style="color:${lv>=4?'var(--hot)':lv<=2?'var(--cold)':'var(--muted)'}">${c}</div></div>`;
+  }).join('');
+
+  // Strong grid
+  document.getElementById('strong-grid').innerHTML=[...Array(7)].map((_,i)=>{
+    const n=i+1,c=strongFreq[n]||0,lv=heatLevel(c,sa,ss);
+    return`<div class="ball-item" title="חזק ${n}: ${c} פעמים">
+      <div class="ball heat-strong" style="opacity:${.5+.5*(lv/5)}">${n}</div>
+      <div class="ball-count" style="color:var(--strong)">${c}</div></div>`;
+  }).join('');
+
+  // Top hot
+  document.getElementById('top-hot').innerHTML=sorted.slice(0,10).map(([n,c],i)=>`
+    <div class="top-row">
+      <div class="top-rank">#${i+1}</div>
+      <div class="top-ball-mini heat-5" style="background:linear-gradient(135deg,#ff2020,#ff8060)">${n}</div>
+      <div class="top-label">מספר ${n}</div>
+      <div class="top-bar-wrap"><div class="top-bar" style="width:${c/maxC*100}%;background:linear-gradient(90deg,var(--hot),var(--warm))"></div></div>
+      <div class="top-count">${c}x</div></div>`).join('');
+
+  // Top cold
+  document.getElementById('top-cold').innerHTML=[...sorted].reverse().slice(0,10).map(([n,c],i)=>`
+    <div class="top-row">
+      <div class="top-rank">#${i+1}</div>
+      <div class="top-ball-mini heat-1">${n}</div>
+      <div class="top-label">מספר ${n}</div>
+      <div class="top-bar-wrap"><div class="top-bar" style="width:${c/maxC*100}%;background:linear-gradient(90deg,var(--cold),var(--cool))"></div></div>
+      <div class="top-count">${c}x</div></div>`).join('');
+
+  // Top strong
+  const sortedS=Object.entries(strongFreq).sort((a,b)=>b[1]-a[1]),maxS=sortedS[0][1];
+  document.getElementById('top-strong').innerHTML=sortedS.map(([n,c],i)=>`
+    <div class="top-row">
+      <div class="top-rank">#${i+1}</div>
+      <div class="top-ball-mini" style="background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff">${n}</div>
+      <div class="top-label">מספר חזק ${n}</div>
+      <div class="top-bar-wrap"><div class="top-bar" style="width:${c/maxS*100}%;background:linear-gradient(90deg,#7c3aed,#c084fc)"></div></div>
+      <div class="top-count">${c}x</div></div>`).join('');
+
+  // Recent
+  document.getElementById('recent-list').innerHTML=allDraws.slice(0,20).map(dr=>`
+    <div class="recent-row">
+      <div class="recent-date">📅 ${dr.date}</div>
+      <div class="recent-balls">
+        ${dr.numbers.map(n=>`<div class="mini-ball ${heatClass(heatLevel(mainFreq[n]||0,avg,std))}">${n}</div>`).join('')}
+        <span style="color:var(--muted);font-size:18px">+</span>
+        <div class="mini-strong">${dr.strong}</div>
+      </div></div>`).join('');
+}
+
+// ── Generator ───────────────────────────────────────────────────
+function generateLine(){
+  if(!allDraws.length){alert('טען קודם נתונים!');return}
+  const{avg,std}=calcStats(mainFreq);
+  const sorted=Object.entries(mainFreq).sort((a,b)=>b[1]-a[1]);
+  let pool;
+  if(genMode==='hot')        pool=sorted.slice(0,18).map(([n])=>+n);
+  else if(genMode==='cold')  pool=sorted.slice(-18).map(([n])=>+n);
+  else if(genMode==='mix')   pool=[...sorted.slice(0,12).map(([n])=>+n),...sorted.slice(-8).map(([n])=>+n)];
+  else                       pool=[...Array(37)].map((_,i)=>i+1);
+
+  const nums=[],sh=[...pool].sort(()=>Math.random()-.5);
+  while(nums.length<6&&sh.length) {const p=sh.pop();if(!nums.includes(p))nums.push(p);}
+  nums.sort((a,b)=>a-b);
+
+  const sPool=genMode==='hot'
+    ?Object.entries(strongFreq).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([n])=>+n)
+    :[...Array(7)].map((_,i)=>i+1);
+  const strong=sPool[Math.floor(Math.random()*sPool.length)];
+
+  document.getElementById('gen-balls').innerHTML=
+    nums.map((n,i)=>`<div class="gen-ball ${heatClass(heatLevel(mainFreq[n]||0,avg,std))}" style="animation-delay:${i*.08}s">${n}</div>`).join('')+
+    `<div style="display:flex;align-items:center;font-size:24px;color:var(--muted);margin:0 4px">+</div>`+
+    `<div class="gen-ball heat-strong" style="animation-delay:.5s">${strong}</div>`;
+
+  genHistory.unshift({nums,strong});
+  if(genHistory.length>5)genHistory.pop();
+  const{avg:a2,std:s2}=calcStats(mainFreq);
+  document.getElementById('gen-history').innerHTML=genHistory.slice(1).map(g=>`
+    <div style="display:flex;gap:6px;align-items:center;padding:8px;background:var(--surface2);border-radius:8px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--muted);width:100%">קודם:</span>
+      ${g.nums.map(n=>`<div class="mini-ball ${heatClass(heatLevel(mainFreq[n]||0,a2,s2))}">${n}</div>`).join('')}
+      <span style="color:var(--muted)">+</span><div class="mini-strong">${g.strong}</div>
+    </div>`).join('');
+}
+
+// ── Init placeholder ────────────────────────────────────────────
+(function(){
+  document.getElementById('main-grid').innerHTML=[...Array(37)].map((_,i)=>
+    `<div class="ball-item"><div class="ball heat-1" style="opacity:.3">${i+1}</div><div class="ball-count" style="color:var(--muted)">-</div></div>`
+  ).join('');
+  document.getElementById('strong-grid').innerHTML=[...Array(7)].map((_,i)=>
+    `<div class="ball-item"><div class="ball heat-strong" style="opacity:.2">${i+1}</div><div class="ball-count" style="color:var(--muted)">-</div></div>`
+  ).join('');
+})();
+</script>
+</body>
+</html>
