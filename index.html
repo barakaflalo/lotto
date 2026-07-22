@@ -140,6 +140,55 @@
   .msg.ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:var(--green);display:block}
   .msg.err{background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);color:#ff8080;display:block}
   .msg.info{background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);color:var(--gold);display:block}
+  /* ABOUT */
+  .ab-hero{text-align:center;padding:8px 0 20px}
+  .ab-icon{width:72px;height:72px;border-radius:20px;background:rgba(245,200,66,.1);
+    border:1.5px solid rgba(245,200,66,.35);display:flex;align-items:center;justify-content:center;
+    margin:0 auto 14px;font-size:34px}
+  .ab-name{font-size:22px;font-weight:900;color:var(--gold)}
+  .ab-ver{font-size:12px;color:var(--muted);margin-top:5px}
+  .ab-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:6px 16px;margin-bottom:14px}
+  .ab-line{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:11px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .ab-line:last-child{border-bottom:none}
+  .ab-line span:first-child{color:var(--muted)}
+  .ab-line span:last-child{color:var(--text);text-align:left}
+  .ab-line .hl{color:var(--gold);font-weight:700}
+  .ab-link{background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.3);border-radius:14px;
+    padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;cursor:pointer;
+    transition:all .2s;width:100%;text-align:right;font-family:'Heebo',sans-serif}
+  .ab-link:hover{background:rgba(245,200,66,.13);border-color:var(--gold);transform:translateY(-1px)}
+  .ab-link-icon{width:40px;height:40px;border-radius:11px;background:rgba(245,200,66,.12);
+    border:1px solid rgba(245,200,66,.3);display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;font-size:19px}
+  .ab-link-body{flex:1}
+  .ab-link-title{font-size:14px;font-weight:700;color:var(--gold)}
+  .ab-link-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .ab-link-arrow{color:var(--muted);font-size:17px}
+  .ab-row{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px;cursor:pointer;
+    transition:all .2s;width:100%;text-align:right;font-family:'Heebo',sans-serif}
+  .ab-row:hover{border-color:var(--gold)}
+  .ab-row-icon{width:40px;height:40px;border-radius:11px;background:var(--surface2);
+    border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;font-size:18px}
+  .ab-row-body{flex:1}
+  .ab-row-title{font-size:14px;font-weight:700;color:var(--text)}
+  .ab-row-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .ab-warn{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:16px;margin:14px 0 6px}
+  .ab-warn-h{font-size:13px;font-weight:700;color:var(--text);margin-bottom:9px;
+    display:flex;align-items:center;gap:7px}
+  .ab-warn-b{font-size:11.5px;color:var(--muted);line-height:1.85}
+  .ab-copy{text-align:center;font-size:11.5px;color:var(--muted);padding:18px 0 4px;line-height:1.7}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:99;
+    background:var(--surface2);border:1px solid var(--gold);color:var(--gold);
+    padding:12px 24px;border-radius:100px;font-size:13.5px;font-weight:700;
+    box-shadow:0 8px 30px rgba(0,0,0,.55);animation:tIn .3s ease both}
+  @keyframes tIn{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+  .toast.out{animation:tOut .3s ease forwards}
+  @keyframes tOut{to{opacity:0;transform:translate(-50%,14px)}}
   @media(max-width:600px){.ball{width:44px;height:44px;font-size:14px}.balls-grid{gap:6px}
     .pick{width:38px;height:38px;font-size:13px}}
 </style>
@@ -165,6 +214,7 @@
     <div class="tab" onclick="showTab('gen',this)">✨ מחולל חכם</div>
     <div class="tab" onclick="showTab('chk',this)">🔍 בודק היסטוריה</div>
     <div class="tab" onclick="showTab('upd',this)">🔄 עדכון נתונים</div>
+    <div class="tab" onclick="showTab('about',this)">ℹ️ אודות</div>
   </div>
 
   <div id="tab-heat">
@@ -277,6 +327,67 @@
     </div>
   </div>
 
+  <div id="tab-about" style="display:none">
+    <div class="section">
+      <div class="ab-hero">
+        <div class="ab-icon">🎱</div>
+        <div class="ab-name">לוטו ישראל</div>
+        <div class="ab-ver">מנתח סטטיסטי · גרסה 1.0.0</div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-line"><span>גרסה</span><span>1.0.0</span></div>
+        <div class="ab-line"><span>פותח על ידי</span><span class="hl">Barak Aflalo</span></div>
+        <div class="ab-line"><span>פלטפורמה</span><span>PWA · HTML5</span></div>
+        <div class="ab-line"><span>אחסון נתונים</span><span>על המכשיר בלבד</span></div>
+        <div class="ab-line"><span>מקור הנתונים</span><span>מפעל הפיס</span></div>
+        <div class="ab-line"><span>עדכני ל־</span><span class="hl" id="ab-asof">—</span></div>
+        <div class="ab-line"><span>הגרלות בארכיון</span><span id="ab-count">—</span></div>
+        <div class="ab-line"><span>רישיון</span><span>© AppNest 2026</span></div>
+      </div>
+
+      <button class="ab-link" onclick="openLink('https://barakaflalo.github.io/appnest')">
+        <div class="ab-link-icon">▦</div>
+        <div class="ab-link-body">
+          <div class="ab-link-title">AppNest</div>
+          <div class="ab-link-sub">עוד אפליקציות של Barak Aflalo</div>
+        </div>
+        <div class="ab-link-arrow">↗</div>
+      </button>
+
+      <button class="ab-row" onclick="shareApp()">
+        <div class="ab-row-icon">🔗</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">שתף את האפליקציה</div>
+          <div class="ab-row-sub">שלח לחבר</div>
+        </div>
+        <div class="ab-link-arrow">‹</div>
+      </button>
+
+      <button class="ab-row" onclick="sendFeedback()">
+        <div class="ab-row-icon">💬</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">שלח משוב</div>
+          <div class="ab-row-sub">דווח על בעיה או הצע שיפור</div>
+        </div>
+        <div class="ab-link-arrow">‹</div>
+      </button>
+
+      <div class="ab-warn">
+        <div class="ab-warn-h">⚠️ הסרת אחריות</div>
+        <div class="ab-warn-b">
+          הלוטו הוא הגרלה אקראית לחלוטין. כל הגרלה עצמאית ואינה מושפעת מתוצאות קודמות — מספר שיצא הרבה בעבר אינו בעל סיכוי גבוה יותר לצאת שוב, ולהפך. הסטטיסטיקה, מפות החום והמחולל באפליקציה זו נועדו למידע ולבידור בלבד, ואינם מנבאים ואינם יכולים לנבא תוצאות עתידיות.
+          <br><br>
+          הנתונים נאספים מקובץ הארכיון הרשמי של מפעל הפיס ומוצגים לנוחות בלבד. ייתכנו טעויות, עיכובים או אי-דיוקים. יש לאמת כל נתון מול האתר הרשמי של מפעל הפיס לפני קבלת החלטה. האפליקציה והמפתחים אינם אחראים לכל נזק, הפסד או החלטה שהתקבלה על סמך המידע.
+          <br><br>
+          השתתפות בהגרלות אסורה מתחת לגיל 18 ועלולה להיות ממכרת. אם ההימורים משפיעים עליך או על סביבתך — ניתן לפנות לקו הסיוע של הרשות הלאומית לגמילה מהימורים.
+        </div>
+      </div>
+
+      <div class="ab-copy">© 2026 Barak Aflalo · AppNest · כל הזכויות שמורות</div>
+    </div>
+  </div>
+
   <div class="disclaimer">⚡ הלוטו הוא הגרלה אקראית — כל הצגה סטטיסטית כאן היא לצרכי מידע ובידור בלבד ואינה מנבאת תוצאות</div>
 </div>
 
@@ -323,6 +434,7 @@ function recompute(){
     strongFreq[d[2]]++;
   }
   renderAll();
+  refreshAbout();
   $('stats-bar').style.display='flex';
   $('chk-range').textContent=statsDraws.length;
   $('range-note').textContent=
@@ -622,6 +734,9 @@ async function buildExport(){
      'chk-results','chk-summary','gen-history','stats-bar','pick-main','pick-strong'].forEach(id=>{
       const el=$(id); if(el){snap.push([el,el.innerHTML]); el.innerHTML='';}
     });
+    ['ab-asof','ab-count'].forEach(id=>{
+      const el=$(id); if(el){snap.push([el,el.innerHTML]); el.innerHTML='—';}
+    });
     src='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
     snap.forEach(([el,html])=>{el.innerHTML=html;});
   }
@@ -634,6 +749,34 @@ async function buildExport(){
   if(si<0||ei<0)throw new Error('לא ניתן לאתר את בלוק הנתונים בקובץ.');
   const eol=src.indexOf('\n',ei);
   return src.slice(0,si)+startTag+' — עודכן '+pendingAsOf+' ═══\n'+newData+src.slice(eol+1);
+}
+
+// ── About ───────────────────────────────────────────────
+function refreshAbout(){
+  const a=$('ab-asof'), c=$('ab-count');
+  if(a)a.textContent=dataAsOf;
+  if(c)c.textContent=allDraws.length.toLocaleString('he-IL')+' (מאז 1968)';
+}
+function openLink(url){window.open(url,'_blank');}
+function shareApp(){
+  const url='https://barakaflalo.github.io/appnest';
+  const txt='לוטו ישראל — מנתח סטטיסטי להגרלות הלוטו | '+url;
+  if(navigator.share){
+    navigator.share({title:'לוטו ישראל — מנתח סטטיסטי',text:txt,url}).catch(()=>{});
+  }else if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(()=>toast('הקישור הועתק!')).catch(()=>toast('לא ניתן להעתיק'));
+  }else{
+    toast('שיתוף אינו נתמך בדפדפן זה');
+  }
+}
+function sendFeedback(){
+  window.open('mailto:appnest55@gmail.com?subject='+encodeURIComponent('לוטו ישראל — משוב'));
+}
+function toast(msg){
+  const t=document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300);},2600);
 }
 
 // ── Tabs ────────────────────────────────────────────────
