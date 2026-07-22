@@ -213,7 +213,6 @@
     <div class="tab" onclick="showTab('recent',this)">📅 הגרלות אחרונות</div>
     <div class="tab" onclick="showTab('gen',this)">✨ מחולל חכם</div>
     <div class="tab" onclick="showTab('chk',this)">🔍 בודק היסטוריה</div>
-    <div class="tab" onclick="showTab('upd',this)">🔄 עדכון נתונים</div>
     <div class="tab" onclick="showTab('about',this)">ℹ️ אודות</div>
   </div>
 
@@ -293,40 +292,6 @@
     </div>
   </div>
 
-  <div id="tab-upd" style="display:none">
-    <div class="section">
-      <div class="section-title">עדכון נתונים מקובץ הפיס</div>
-      <div class="upd-box">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <h4>הורד את הקובץ מהפיס</h4>
-            <p>היכנס לאתר מפעל הפיס → ארכיון תוצאות לוטו → הורד את קובץ ה-CSV המלא.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <h4>טען את הקובץ כאן</h4>
-            <p>הקובץ נקרא במכשיר שלך בלבד ואינו נשלח לשום מקום.</p>
-            <input type="file" id="csv-in" class="file-in" accept=".csv" onchange="handleCSV(event)">
-            <button class="btn primary" onclick="document.getElementById('csv-in').click()">📂 בחר קובץ CSV</button>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <h4>הורד קובץ מעודכן להעלאה לאתר</h4>
-            <p>נוצר קובץ HTML שלם עם הנתונים החדשים בפנים. העלה אותו לגיטהאב בשם <code style="background:var(--surface2);padding:2px 7px;border-radius:5px">index.html</code> וכל המבקרים יראו את העדכון.</p>
-            <button class="btn" id="btnExport" onclick="exportHTML()" disabled>💾 הורד קובץ מעודכן</button>
-          </div>
-        </div>
-        <div id="upd-msg" class="msg"></div>
-      </div>
-      <p class="data-note">שים לב: טעינת הקובץ מעדכנת את התצוגה במכשיר זה בלבד. כדי שהעדכון יופיע אצל כל המשתמשים באתר, יש להוריד את הקובץ בשלב 3 ולהעלות אותו לגיטהאב.</p>
-    </div>
-  </div>
-
   <div id="tab-about" style="display:none">
     <div class="section">
       <div class="ab-hero">
@@ -372,6 +337,46 @@
         </div>
         <div class="ab-link-arrow">‹</div>
       </button>
+
+      <button class="ab-row" id="upd-toggle" onclick="toggleUpd()">
+        <div class="ab-row-icon">🔄</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">עדכון נתונים</div>
+          <div class="ab-row-sub">טעינת קובץ הפיס והפצה לאתר</div>
+        </div>
+        <div class="ab-link-arrow" id="upd-chevron">‹</div>
+      </button>
+
+      <div id="upd-panel" style="display:none;margin-bottom:10px">
+        <div class="upd-box">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>הורד את הקובץ מהפיס</h4>
+              <p>היכנס לאתר מפעל הפיס → ארכיון תוצאות לוטו → הורד את קובץ ה-CSV המלא.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>טען את הקובץ כאן</h4>
+              <p>הקובץ נקרא במכשיר שלך בלבד ואינו נשלח לשום מקום.</p>
+              <input type="file" id="csv-in" class="file-in" accept=".csv" onchange="handleCSV(event)">
+              <button class="btn primary" onclick="document.getElementById('csv-in').click()">📂 בחר קובץ CSV</button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>הורד קובץ מעודכן להעלאה לאתר</h4>
+              <p>נוצר קובץ HTML שלם עם הנתונים החדשים בפנים. העלה אותו לגיטהאב בשם <code style="background:var(--surface2);padding:2px 7px;border-radius:5px">index.html</code> וכל המבקרים יראו את העדכון.</p>
+              <button class="btn" id="btnExport" onclick="exportHTML()" disabled>💾 הורד קובץ מעודכן</button>
+            </div>
+          </div>
+          <div id="upd-msg" class="msg"></div>
+          <p class="data-note" style="margin-top:4px">שים לב: טעינת הקובץ מעדכנת את התצוגה במכשיר זה בלבד. כדי שהעדכון יופיע אצל כל המשתמשים באתר, יש להוריד את הקובץ בשלב 3 ולהעלות אותו לגיטהאב.</p>
+        </div>
+      </div>
 
       <div class="ab-warn">
         <div class="ab-warn-h">⚠️ הסרת אחריות</div>
@@ -737,7 +742,14 @@ async function buildExport(){
     ['ab-asof','ab-count'].forEach(id=>{
       const el=$(id); if(el){snap.push([el,el.innerHTML]); el.innerHTML='—';}
     });
+    // ensure the update accordion is exported in its default (collapsed) state
+    const up=$('upd-panel'), uc=$('upd-chevron');
+    const upWas=up?up.style.display:null, ucWas=uc?uc.textContent:null;
+    if(up)up.style.display='none';
+    if(uc)uc.textContent='‹';
     src='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    if(up&&upWas!==null)up.style.display=upWas;
+    if(uc&&ucWas!==null)uc.textContent=ucWas;
     snap.forEach(([el,html])=>{el.innerHTML=html;});
   }
 
@@ -752,6 +764,12 @@ async function buildExport(){
 }
 
 // ── About ───────────────────────────────────────────────
+function toggleUpd(){
+  const p=$('upd-panel'), c=$('upd-chevron');
+  const open=p.style.display!=='none';
+  p.style.display=open?'none':'block';
+  if(c)c.textContent=open?'‹':'⌄';
+}
 function refreshAbout(){
   const a=$('ab-asof'), c=$('ab-count');
   if(a)a.textContent=dataAsOf;
