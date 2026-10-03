@@ -2,7 +2,12 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<script>/* Moved to its own address. Redirect ONLY from the old GitHub Pages address (same repo feeds both). */(function(){try{if(location.hostname==='barakaflalo.github.io'){var p=location.pathname.replace(/^\/[^\/]+/,'')||'/';location.replace('https://lotto-appnest.pages.dev'+p+location.search+location.hash);}}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>לוטו ישראל - מנתח סטטיסטי</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -311,7 +316,7 @@
         <div class="ab-line"><span>רישיון</span><span>© AppNest 2026</span></div>
       </div>
 
-      <button class="ab-link" onclick="openLink('https://barakaflalo.github.io/appnest')">
+      <button class="ab-link" onclick="openLink('https://appnest-store.pages.dev')">
         <div class="ab-link-icon">▦</div>
         <div class="ab-link-body">
           <div class="ab-link-title">AppNest</div>
@@ -334,6 +339,15 @@
         <div class="ab-row-body">
           <div class="ab-row-title">שלח משוב</div>
           <div class="ab-row-sub">דווח על בעיה או הצע שיפור</div>
+        </div>
+        <div class="ab-link-arrow">‹</div>
+      </button>
+
+      <button class="ab-row" onclick="openLink('privacy_policy.html')">
+        <div class="ab-row-icon">🛡️</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">מדיניות פרטיות</div>
+          <div class="ab-row-sub">אין איסוף מידע · הכל על המכשיר</div>
         </div>
         <div class="ab-link-arrow">‹</div>
       </button>
@@ -777,7 +791,7 @@ function refreshAbout(){
 }
 function openLink(url){window.open(url,'_blank');}
 function shareApp(){
-  const url='https://barakaflalo.github.io/appnest';
+  const url=location.href.split('#')[0];
   const txt='לוטו ישראל — מנתח סטטיסטי להגרלות הלוטו | '+url;
   if(navigator.share){
     navigator.share({title:'לוטו ישראל — מנתח סטטיסטי',text:txt,url}).catch(()=>{});
@@ -812,5 +826,6 @@ $('strong-grid').innerHTML=[...Array(7)].map((_,i)=>
   '<div class="ball-item"><div class="ball heat-strong" style="opacity:.2">'+(i+1)+'</div><div class="ball-count" style="color:var(--muted)">-</div></div>').join('');
 initData();
 </script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}</script>
 </body>
 </html>
